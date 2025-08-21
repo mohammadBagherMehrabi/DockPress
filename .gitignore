@@ -1,0 +1,6 @@
+.env-wordpress
+wordpress-files/wp-app/
+wordpress-files/plugin-name/
+wordpress-files/theme-name/
+wordpress-files/wp-data/
+.idea

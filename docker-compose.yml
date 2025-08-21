@@ -1,0 +1,80 @@
+version: '3'
+
+services:
+  wp:
+    env_file:
+      - .env
+    container_name: ${WP_CONTAINER_NAME:-wordpress_wp}
+    image: wordpress:latest # https://hub.docker.com/_/wordpress/
+    restart: unless-stopped
+    ports:
+      - ${IP}:${PORT}:80 # change ip if required
+    volumes:
+      - ./wordpress-files/wordpress-config/wp_php.ini:/usr/local/etc/php/conf.d/conf.ini
+      - ./wordpress-files/wp-app:/var/www/html # Full wordpress project
+      - ./wordpress-files/plugin-name/trunk/:/var/www/html/wp-content/plugins/plugin-name # Plugin development
+      - ./wordpress-files/theme-name/trunk/:/var/www/html/wp-content/themes/theme-name # Theme development
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: "${DB_NAME}"
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: "${DB_ROOT_PASSWORD}"
+    depends_on:
+      - db
+    links:
+      - db
+
+  wpcli:
+    container_name: ${WPCLI_CONTAINER_NAME:-wordpress_wpcli}
+    image: wordpress:cli
+    restart: unless-stopped
+    volumes:
+      - ./wordpress-files/wordpress-config/wp_php.ini:/usr/local/etc/php/conf.d/conf.ini
+      - ./wordpress-files/wp-app:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: "${DB_NAME}"
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: "${DB_ROOT_PASSWORD}"
+    depends_on:
+      - db
+      - wp
+
+  pma:
+    container_name: ${PMA_CONTAINER_NAME:-wordpress_pma}
+    image: phpmyadmin:latest  # https://hub.docker.com/_/phpmyadmin
+    restart: unless-stopped
+    environment:
+      # https://docs.phpmyadmin.net/en/latest/setup.html#docker-environment-variables
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+      UPLOAD_LIMIT: 50M
+    ports:
+      - ${IP}:${PMA_PORT}:80
+    links:
+      - db:db
+    volumes:
+     - ./wordpress-files/wordpress-config/pma_php.ini:/usr/local/etc/php/conf.d/conf.ini
+     - ./wordpress-files/wordpress-config/pma_config.php:/etc/phpmyadmin/wordpress-config.user.inc.php
+
+  db:
+    container_name: ${DB_CONTAINER_NAME:-wordpress_pma}
+    image: mysql:latest # https://hub.docker.com/_/mysql/ - or mariadb https://hub.docker.com/_/mariadb
+    # platform: linux/x86_64  # Uncomment if your machine is running on arm (ex: Apple Silicon processor)
+    restart: unless-stopped
+    ports:
+      - ${IP}:3306:3306 # change ip if required
+    command: [
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci'
+    ]
+    volumes:
+      - ./wordpress-files/wp-data:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+
+volumes:
+  db_data:
