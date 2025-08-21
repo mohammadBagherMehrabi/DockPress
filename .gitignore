@@ -1,4 +1,4 @@
-.env-wordpress
+.env
 wordpress-files/wp-app/
 wordpress-files/plugin-name/
 wordpress-files/theme-name/
