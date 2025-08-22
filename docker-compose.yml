@@ -2,6 +2,7 @@ version: '3'
 
 services:
   wp:
+    platform: linux/amd64
     env_file:
       - .env
     container_name: ${WP_CONTAINER_NAME:-wordpress_wp}
@@ -25,6 +26,7 @@ services:
       - db
 
   wpcli:
+    platform: linux/amd64
     container_name: ${WPCLI_CONTAINER_NAME:-wordpress_wpcli}
     image: wordpress:cli
     restart: unless-stopped
@@ -41,6 +43,7 @@ services:
       - wp
 
   pma:
+    platform: linux/amd64
     container_name: ${PMA_CONTAINER_NAME:-wordpress_pma}
     image: phpmyadmin:latest  # https://hub.docker.com/_/phpmyadmin
     restart: unless-stopped
@@ -59,6 +62,7 @@ services:
      - ./wordpress-files/wordpress-config/pma_config.php:/etc/phpmyadmin/wordpress-config.user.inc.php
 
   db:
+    platform: linux/amd64
     container_name: ${DB_CONTAINER_NAME:-wordpress_pma}
     image: mysql:latest # https://hub.docker.com/_/mysql/ - or mariadb https://hub.docker.com/_/mariadb
     # platform: linux/x86_64  # Uncomment if your machine is running on arm (ex: Apple Silicon processor)
