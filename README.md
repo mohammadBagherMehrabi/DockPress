@@ -22,8 +22,8 @@ This repository provides a Docker Compose setup for running a local WordPress de
 
 1. Clone this repository:
    ```bash
-   git clone <your-repository-url>
-   cd <repository-directory>
+   git clone https://github.com/mohammadBagherMehrabi/DockPress.git
+   cd DockPress
    ```
 
 2. Copy the environment example file:
