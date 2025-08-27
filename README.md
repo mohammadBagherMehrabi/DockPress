@@ -89,22 +89,41 @@ Additional phpMyAdmin settings are in:
 
 ### WordPress CLI
 
-Use WP-CLI through the dedicated container:
-```bash
-docker-compose exec wpcli wp <command>
-```
+The environment includes a dedicated container for WP-CLI.
 
-Examples:
+There are two ways to use it:
+
+### 1. Run single commands directly
+Execute one-off WP-CLI commands using `docker-compose exec`:
+
 ```bash
 # List installed plugins
 docker-compose exec wpcli wp plugin list
 
-# Install a new plugin
+# Install and activate a plugin
 docker-compose exec wpcli wp plugin install akismet --activate
 
 # Update WordPress core
 docker-compose exec wpcli wp core update
 ```
+
+### 2. Interactive WP-CLI session
+Since the `wpcli` container is configured to stay alive (`tail -f /dev/null`),  
+you can open an interactive bash shell and run multiple commands sequentially:
+
+```bash
+docker exec -it your_project_wpcli bash
+```
+
+Inside the container, you can use WP-CLI normally:
+
+```bash
+wp post list --post_type=product
+wp plugin list
+wp option get siteurl
+```
+
+This approach is useful when you want to work continuously without re-running `docker-compose exec` for each command.
 
 ### Database Management
 
